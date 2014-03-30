@@ -27,6 +27,8 @@ def uc_get_enemy_action(game_tree):
     accept_action = False
     while not accept_action:
         s = input('Please enter an action for Team2 (enter h for help): ')
+        print(s[0:6])
+        print(s[6])
         if s == 'h' or s == 'help':
             print('Help:')
             print('move#: the move you wish to select, #={1[2,3,4]}*')
@@ -50,7 +52,8 @@ def uc_get_enemy_action(game_tree):
             else:
                 accept_action = game_tree.state.is_action_valid(b, game_tree.state.team2)
             #TODO: query for modifiers
-        else:
+
+        if not accept_action:
             print('Invalid command. Please try again.')
             if CONF['debug_level'] >= 1:
                 print(len(s))
