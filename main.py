@@ -35,7 +35,7 @@ def uc_get_enemy_action(game_tree):
 
         elif len(s) == 5 and s[0:4] == 'move':
             try:
-                b = int(s[4]) # don't delete this! we need to return something
+                b = int(s[4]) - 1 # don't delete this! we need to return something
             except:
                 pass
             else:
@@ -44,15 +44,17 @@ def uc_get_enemy_action(game_tree):
             
         elif len(s) == 7 and s[0:6] == 'switch':
             try:
-                b = int(s[6]) + Action.SWITCH_OFFSET # don't delete this! we need to return something
+                b = int(s[6]) - 1 + Action.SWITCH_OFFSET # don't delete this! we need to return something
             except:
                 pass
             else:
                 accept_action = game_tree.state.is_action_valid(b, game_tree.state.team2)
             #TODO: query for modifiers
         else:
-            print(len(s))
-            print(s[0:3])
+            print('Invalid command. Please try again.')
+            if CONF['debug_level'] >= 1:
+                print(len(s))
+                print(s[0:3])
     return b
 
 
@@ -74,10 +76,10 @@ if __name__ == '__main__':
     while True:
         print("Current State: \n%s" % str(game_state))
         game_tree = SearchNode(game_state)
-        if game_tree.is_goal() == -1:
+        if game_tree.is_goal() == 1:
             print('The enemy team wins!')
             break
-        elif game_tree.is_goal() == 1:
+        elif game_tree.is_goal() == -1:
             print('The ally team wins!')
             break
 
@@ -85,7 +87,6 @@ if __name__ == '__main__':
         print('Best action for Team 1: %s' % Action.to_str(a))
         b = get_enemy_action(game_tree) 
 
-        
         game_state = game_state.mutate(a, b)
         
     if CONF['debug_level'] >= 1:
