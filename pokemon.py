@@ -131,7 +131,7 @@ class Pokemon():
             self.spatk = spatk
             self.spdefn = spdefn
             self.spd = spd
-            self.stat_mod = [0] * 5 # one for atk --> spd
+            self.stat_mod = {'atk': 0, 'defn':0, 'spatk':0, 'spdefn':0, 'spd':0}
 
             if len(moves) < 4:
                 self.moves = []
@@ -209,8 +209,18 @@ def attack(atk_pkmn, def_pkmn, move_index, max_damage=False):
             dmg = 0
 
         def_pkmn.curhp = 0 if def_pkmn.curhp - dmg <= 0 else def_pkmn.curhp - dmg
+        atk_pkmn, def_pkmn = apply_effect(atk_pkmn, def_pkmn, move_index)
         atk_pkmn.moves[move_index].curpp -= 1
+
     return def_pkmn
+
+
+def apply_effect(atk_pkmn, def_pkmn, move_index):
+    move = atk_pkmn.moves[move_index]
+    if move.effect:
+        return move.effect(move, atk_pkmn, def_pkmn)
+    else:
+        return (atk_pkmn, def_pkmn)
 
 
 def calculate_damage(atk_pkmn, def_pkmn, move_index, R, crit=False,):
@@ -220,8 +230,20 @@ def calculate_damage(atk_pkmn, def_pkmn, move_index, R, crit=False,):
     move = atk_pkmn.moves[move_index]
     level = atk_pkmn.lvl
     base_power = move.bp
-    atk = atk_pkmn.spatk if move.is_special else atk_pkmn.atk
-    defn = def_pkmn.spdefn if move.is_special else def_pkmn.defn
+    if move.is_special:
+        atk = atk_pkmn.spatk 
+        atk = atk * (1 + atk_pkmn.stat_mod['spatk'] * 0.5) if atk_pkmn.stat_mod['spatk'] >= 0 else atk // (1 + atk_pkmn.stat_mod['apatk'] * 0.5)
+
+        defn = def_pkmn.spdefn 
+        defn = defn * (1 + def_pkmn.stat_mod['spdefn'] * 0.5) if def_pkmn.stat_mod['spdefn'] >= 0 else defn // (1 + def_pkmn.stat_mod['spdefn'] * 0.5)
+
+    else:
+        atk = atk_pkmn.atk 
+        atk = floor(atk * (1 + atk_pkmn.stat_mod['atk'] * 0.5) if atk_pkmn.stat_mod['atk'] >= 0 else atk / (1 - atk_pkmn.stat_mod['atk'] * 0.5))
+
+        defn = def_pkmn.defn
+        defn = floor(defn * (1 + def_pkmn.stat_mod['defn'] * 0.5) if def_pkmn.stat_mod['defn'] >= 0 else defn / (1 - def_pkmn.stat_mod['defn'] * 0.5))
+
     ch = 2 if crit else 1
     stab = 1.5 if move.type == atk_pkmn.type1 or move.type == atk_pkmn.type2 else 1
     type_mul = Type.get_type_multiplier(move.type, def_pkmn.type1, def_pkmn.type2)
@@ -231,6 +253,7 @@ def calculate_damage(atk_pkmn, def_pkmn, move_index, R, crit=False,):
     mod1 = 1 # eww
     mod2 = 1 # eww
     mod3 = 1 # eww
+    
     
     # CRITICAL: MAKE SURE ALL OPERATIONS RESULT IN A ROUNDED-DOWN WHOLE NUMBER
     return floor(floor(floor((floor((floor(

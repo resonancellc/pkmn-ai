@@ -60,7 +60,7 @@ def uc_get_enemy_action(game_tree):
 
 if __name__ == '__main__':
     if 'enemy_config' in CONF:
-        if CONF['enemy_config'] == 'computer-controlled':
+        if CONF['enemy_config'] == 'computer-controlled' or CONF['enemy_config'] == 'ai':
             get_enemy_action = ai_get_enemy_action
         elif CONF['enemy_config'] == 'random':
             get_enemy_action = random_get_enemy_action
