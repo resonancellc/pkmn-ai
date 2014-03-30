@@ -66,8 +66,8 @@ class PkmnState():
             # team1 switches, then team2 attack
             # TODO: account for Pursuit
             team1.curpkmn = actions[0] - Action.SWITCH_OFFSET
-            team2.pkmn[team2.curpkmn] = attack(team2.get_cur_pkmn(), team1.get_cur_pkmn(), actions[1])
-            if team2.get_cur_pkmn().curhp == 0:
+            team1.pkmn[team1.curpkmn] = attack(team2.get_cur_pkmn(), team1.get_cur_pkmn(), actions[1])
+            if team1.get_cur_pkmn().curhp == 0:
                 # TODO: Implement proper switching
                 team1.curpkmn = team1.get_next_pkmn()
 
@@ -75,10 +75,10 @@ class PkmnState():
             # team2 switches, then team1 attacks
             # TODO: account for Pursuit
             team2.curpkmn = actions[1] - Action.SWITCH_OFFSET
-            team1.pkmn[team1.curpkmn] = attack(team1.get_cur_pkmn(), team2.get_cur_pkmn(), actions[0])
-            if team1.get_cur_pkmn().curhp == 0:
+            team2.pkmn[team2.curpkmn] = attack(team1.get_cur_pkmn(), team2.get_cur_pkmn(), actions[0])
+            if team2.get_cur_pkmn().curhp == 0:
                 # TODO: Implement proper switching
-                team1.curpkmn = team1.get_next_pkmn()
+                team2.curpkmn = team2.get_next_pkmn()
 
         else: # both teams attack
             t1p = team1.get_cur_pkmn()
